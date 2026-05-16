@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   // EMPLOYEE, MANAGER, ADMIN
+  department String?
+  managerId  String?
+  manager    User?    @relation("ManagerToEmployee", fields: [managerId], references: [id])
+  employees  User[]   @relation("ManagerToEmployee")
+  goals      Goal[]   @relation("EmployeeGoals")
+  checkIns   CheckIn[] @relation("ManagerCheckIns")
+  checkInStreak Int    @default(0)
+  badges     String    @default("") // Comma-separated string
+  escalationLogs EscalationLog[]
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  thrustArea  String
+  uom         String   // NUMERIC, PERCENT, TIMELINE, ZERO_BASED
+  target      String
+  weightage   Float
+  status      String   @default("DRAFT") // DRAFT, SUBMITTED, APPROVED, RETURNED
+  isLocked    Boolean  @default(false)
+  employeeId  String
+  employee    User     @relation("EmployeeGoals", fields: [employeeId], references: [id])
+  checkIns    CheckIn[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  parentId    String?  // For shared goals (linked to Admin/Manager KPIs)
+  isTemplate  Boolean  @default(false)
+}
+
+model CheckIn {
+  id                String   @id @default(uuid())
+  quarter           String   // Q1, Q2, Q3, Q4
+  actualAchievement String?
+  status            String   @default("NOT_STARTED") // NOT_STARTED, ON_TRACK, COMPLETED
+  managerComment    String?
+  employeeComment   String?
+  goalId            String
+  goal              Goal     @relation(fields: [goalId], references: [id])
+  managerId         String?
+  manager           User?    @relation("ManagerCheckIns", fields: [managerId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([goalId, quarter])
+}
+
+model SystemSetting {
+  id           String   @id @default(uuid())
+  activeWindow String   @default("GOAL_SETTING") // GOAL_SETTING, Q1, Q2, Q3, Q4
+}
+
+model EscalationRule {
+  id              String   @id @default(uuid())
+  name            String
+  conditionType   String   // e.g. "NO_GOAL_SUBMITTED", "MANAGER_NOT_APPROVED"
+  daysThreshold   Int
+  action          String   // e.g. "NOTIFY_MANAGER", "NOTIFY_HR"
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  escalationLogs  EscalationLog[]
+}
+
+model EscalationLog {
+  id              String   @id @default(uuid())
+  ruleId          String
+  userId          String   // The user who triggered the violation
+  details         String   // E.g., "Alice AE has not submitted goals 15 days after window opened"
+  status          String   @default("OPEN") // OPEN, RESOLVED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  rule            EscalationRule @relation(fields: [ruleId], references: [id])
+  user            User           @relation(fields: [userId], references: [id])
+}
