@@ -34,12 +34,14 @@ export default function EmployeeDashboard() {
     }
   }, [user])
 
-  const isCycleActive = activeCycle && activeCycle !== 'NONE'
+  // Treat null activeCycle as GOAL_SETTING while loading; only block on explicit 'NONE'
+  const effectiveCycle = activeCycle || 'GOAL_SETTING'
+  const isCycleActive = effectiveCycle !== 'NONE'
 
-  // Filter employee goals matching the active cycle
+  // Filter employee goals matching the effective cycle
   const filteredGoals = goals.filter((goal: any) => {
     const goalCycle = goal.parentId || 'GOAL_SETTING'
-    return goalCycle === activeCycle
+    return goalCycle === effectiveCycle
   })
 
   // Enrich goals with persistent progress and timezone formatted dates
