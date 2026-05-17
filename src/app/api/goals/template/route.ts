@@ -60,6 +60,8 @@ export async function POST(request: Request) {
           target: data.target || '100',
           weightage: adjustedWeightage,
           employeeId: report.id,
+          parentId: data.parentId || 'GOAL_SETTING', // Capture active cycle!
+          status: 'APPROVED' // Pushed by manager is APPROVED instantly!
         }
       })
       createdGoals.push(goal)
@@ -68,7 +70,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ 
       success: true, 
       pushedCount: createdGoals.length, 
-      totalTeam: directReports.length 
+      totalTeam: directReports.length,
+      createdGoals: createdGoals.map(g => ({ employeeId: g.employeeId, title: g.title }))
     })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })

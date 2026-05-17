@@ -4,9 +4,10 @@ import { DashboardLayout } from '@/components/DashboardLayout'
 import { useAuth, User } from '@/components/AuthProvider'
 import { useState, useEffect } from 'react'
 import { X, Send, CheckCircle2, AlertTriangle, Target } from 'lucide-react'
+import { addNotification } from '@/lib/notifications'
 
 export default function ManagerDashboard() {
-  const { user } = useAuth()
+  const { user, activeCycle } = useAuth()
   const [team, setTeam] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -59,6 +60,7 @@ export default function ManagerDashboard() {
           uom: templateUom,
           target: templateTarget,
           weightage: templateWeightage,
+          parentId: activeCycle || 'GOAL_SETTING' // Capture current active cycle!
         })
       })
 
@@ -67,6 +69,18 @@ export default function ManagerDashboard() {
       if (res.ok) {
         setSuccessMsg(`Goal successfully pushed to all ${data.pushedCount} team members!`)
         setIsModalOpen(false)
+        
+        // Dispatch high-fidelity client-side notifications
+        if (data.createdGoals) {
+          data.createdGoals.forEach((g: any) => {
+            addNotification(
+              g.employeeId,
+              templateTitle,
+              `Your manager ${user?.name || 'Priya Menon'} pushed a new goal: "${templateTitle}" — you can now begin working on it.`
+            )
+          })
+        }
+
         // Reset fields
         setTemplateTitle('')
         setTemplateDesc('')
@@ -82,105 +96,119 @@ export default function ManagerDashboard() {
     }
   }
 
+  const isCycleActive = activeCycle && activeCycle !== 'NONE'
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold">Manager War Room</h2>
+          <h2 className="text-2xl font-bold text-slate-800">Manager War Room</h2>
           <p className="text-muted-foreground">Real-time health overview of your entire team's goals.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="btn btn-primary bg-indigo-600 hover:bg-indigo-700 font-bold transition-all shadow-md shadow-indigo-500/20"
+          disabled={!isCycleActive}
+          className={`btn font-bold transition-all shadow-md ${!isCycleActive ? 'bg-slate-200 text-slate-400 cursor-not-allowed border-none shadow-none' : 'btn-primary bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20'}`}
         >
           Push Goal Template
         </button>
       </div>
 
-      {/* Dynamic Success Alert Banner */}
-      {successMsg && (
-        <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold animate-in fade-in slide-in-from-top duration-300">
-          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-          <span>{successMsg}</span>
-          <button onClick={() => setSuccessMsg('')} className="ml-auto text-emerald-500 hover:text-emerald-700">
-            <X className="w-4 h-4" />
-          </button>
+      {!isCycleActive ? (
+        <div className="flex flex-col items-center justify-center py-16 card text-center border-dashed bg-slate-50/50">
+          <AlertTriangle className="w-16 h-16 text-slate-400 mb-4 animate-bounce" />
+          <h3 className="text-xl font-bold text-slate-700 mb-1">No Active Performance Cycle</h3>
+          <p className="text-sm text-slate-500 max-w-md leading-relaxed">
+            There is currently no active cycle configured. Contact HR Administration to unlock goal setting and check-ins.
+          </p>
         </div>
-      )}
-
-      <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="card">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">Team Members</h3>
-          <p className="text-3xl font-bold">{team.length}</p>
-        </div>
-        <div className="card border-green-200 bg-green-50">
-          <h3 className="text-sm font-medium text-green-700 mb-2">On Track</h3>
-          <p className="text-3xl font-bold text-green-600">85%</p>
-        </div>
-        <div className="card border-yellow-200 bg-yellow-50">
-          <h3 className="text-sm font-medium text-yellow-700 mb-2">At Risk</h3>
-          <p className="text-3xl font-bold text-yellow-600">2</p>
-        </div>
-        <div className="card border-red-200 bg-red-50">
-          <h3 className="text-sm font-medium text-red-700 mb-2">Critical</h3>
-          <p className="text-3xl font-bold text-red-600">0</p>
-        </div>
-      </div>
-
-      <h3 className="text-lg font-semibold mb-4">Team Health Grid</h3>
-      {isLoading ? (
-        <p>Loading team data...</p>
-      ) : team.length === 0 ? (
-        <p className="text-muted-foreground py-4 card">No team members found.</p>
       ) : (
-        <div className="grid grid-cols-3 gap-6">
-          {team.map((member) => {
-            // Mock a health status per member to showcase the War Room tile concept
-            const randomHealth = Math.random()
-            const healthStatus = randomHealth > 0.8 ? 'critical' : randomHealth > 0.5 ? 'warning' : 'healthy'
-            
-            let bgClass = 'bg-green-100 border-green-300'
-            let textClass = 'text-green-800'
-            let indicator = 'bg-green-500'
-            
-            if (healthStatus === 'critical') {
-              bgClass = 'bg-red-100 border-red-300'
-              textClass = 'text-red-800'
-              indicator = 'bg-red-500'
-            } else if (healthStatus === 'warning') {
-              bgClass = 'bg-yellow-100 border-yellow-300'
-              textClass = 'text-yellow-800'
-              indicator = 'bg-yellow-500'
-            }
+        <>
+          {/* Dynamic Success Alert Banner */}
+          {successMsg && (
+            <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold animate-in fade-in slide-in-from-top duration-300">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+              <span>{successMsg}</span>
+              <button onClick={() => setSuccessMsg('')} className="ml-auto text-emerald-500 hover:text-emerald-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
-            return (
-              <div 
-                key={member.id} 
-                className={`card cursor-pointer border-2 transition-all hover:shadow-lg ${bgClass}`}
-                onClick={() => window.location.href = `/manager/employee/${member.id}`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className={`font-bold text-lg ${textClass}`}>{member.name}</h4>
-                    <p className={`text-sm ${textClass} opacity-80`}>{member.department}</p>
-                  </div>
-                  <div className={`w-4 h-4 rounded-full ${indicator} animate-pulse`}></div>
-                </div>
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            <div className="card">
+              <h3 className="text-sm font-medium text-slate-500 mb-2 font-semibold">Team Members</h3>
+              <p className="text-3xl font-bold text-slate-800">{team.length}</p>
+            </div>
+            <div className="card border-green-200 bg-green-50/50">
+              <h3 className="text-sm font-medium text-green-700 mb-2 font-semibold">On Track</h3>
+              <p className="text-3xl font-bold text-green-600">85%</p>
+            </div>
+            <div className="card border-yellow-200 bg-yellow-50/50">
+              <h3 className="text-sm font-medium text-yellow-700 mb-2 font-semibold">At Risk</h3>
+              <p className="text-3xl font-bold text-yellow-600">2</p>
+            </div>
+            <div className="card border-red-200 bg-red-50/50">
+              <h3 className="text-sm font-medium text-red-700 mb-2 font-semibold">Critical</h3>
+              <p className="text-3xl font-bold text-red-600">0</p>
+            </div>
+          </div>
+
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Team Health Grid</h3>
+          {isLoading ? (
+            <p className="text-slate-500 font-medium animate-pulse">Loading team data...</p>
+          ) : team.length === 0 ? (
+            <p className="text-muted-foreground py-8 card border-dashed text-center">No team members found.</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-6">
+              {team.map((member) => {
+                const randomHealth = Math.random()
+                const healthStatus = randomHealth > 0.8 ? 'critical' : randomHealth > 0.5 ? 'warning' : 'healthy'
                 
-                <div className="flex justify-between items-center mt-6 pt-4 border-t border-black/10">
-                  <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">1</div>
-                    <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">2</div>
-                    <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">3</div>
+                let bgClass = 'bg-green-100 border-green-300'
+                let textClass = 'text-green-800'
+                let indicator = 'bg-green-500'
+                
+                if (healthStatus === 'critical') {
+                  bgClass = 'bg-red-100 border-red-300'
+                  textClass = 'text-red-800'
+                  indicator = 'bg-red-500'
+                } else if (healthStatus === 'warning') {
+                  bgClass = 'bg-yellow-100 border-yellow-300'
+                  textClass = 'text-yellow-800'
+                  indicator = 'bg-yellow-500'
+                }
+
+                return (
+                  <div 
+                    key={member.id} 
+                    className={`card cursor-pointer border-2 transition-all hover:shadow-lg ${bgClass}`}
+                    onClick={() => window.location.href = `/manager/employee/${member.id}`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className={`font-bold text-lg ${textClass}`}>{member.name}</h4>
+                        <p className={`text-sm ${textClass} opacity-80`}>{member.department}</p>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full ${indicator} animate-pulse shadow-md`}></div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-black/10">
+                      <div className="flex -space-x-2">
+                        <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px] font-bold">1</div>
+                        <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px] font-bold">2</div>
+                        <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px] font-bold">3</div>
+                      </div>
+                      <span className={`text-sm font-bold uppercase tracking-wider text-[11px] ${textClass}`}>
+                        {healthStatus === 'healthy' ? 'On Track' : healthStatus === 'warning' ? 'Needs Review' : 'Off Track'}
+                      </span>
+                    </div>
                   </div>
-                  <span className={`text-sm font-semibold ${textClass}`}>
-                    {healthStatus === 'healthy' ? 'On Track' : healthStatus === 'warning' ? 'Needs Review' : 'Off Track'}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Push Goal Template Modal */}

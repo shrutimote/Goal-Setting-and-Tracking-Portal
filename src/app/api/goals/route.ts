@@ -52,6 +52,8 @@ export async function POST(request: Request) {
         target: data.target,
         weightage: Number(data.weightage),
         employeeId: userId,
+        parentId: data.parentId || 'GOAL_SETTING', // Capture active cycle!
+        status: 'SUBMITTED' // Defaults to SUBMITTED (Pending Approval)
       }
     })
 

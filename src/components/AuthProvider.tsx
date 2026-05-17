@@ -12,6 +12,9 @@ type AuthContextType = {
   loginUser: (userData: User) => void
   logout: () => void
   isLoading: boolean
+  activeCycle: string | null
+  refreshActiveCycle: () => Promise<void>
+  updateActiveCycle: (cycle: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -19,7 +22,39 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [activeCycle, setActiveCycle] = useState<string | null>(null)
   const router = useRouter()
+
+  const refreshActiveCycle = async () => {
+    try {
+      const res = await fetch('/api/settings')
+      if (res.ok) {
+        const data = await res.json()
+        setActiveCycle(data?.activeWindow || 'GOAL_SETTING')
+      } else {
+        setActiveCycle('GOAL_SETTING')
+      }
+    } catch (e) {
+      console.error('Failed to fetch settings:', e)
+      setActiveCycle('GOAL_SETTING')
+    }
+  }
+
+  const updateActiveCycle = async (cycle: string) => {
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activeWindow: cycle })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setActiveCycle(data?.activeWindow || cycle)
+      }
+    } catch (e) {
+      console.error('Failed to update active cycle:', e)
+    }
+  }
 
   useEffect(() => {
     const storedUser = localStorage.getItem('secureUser')
@@ -27,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(JSON.parse(storedUser))
     }
     setIsLoading(false)
+    refreshActiveCycle()
   }, [])
 
   const handleRoleRedirect = (role: string) => {
@@ -48,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loginUser, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, loginUser, logout, isLoading, activeCycle, refreshActiveCycle, updateActiveCycle }}>
       {children}
     </AuthContext.Provider>
   )
