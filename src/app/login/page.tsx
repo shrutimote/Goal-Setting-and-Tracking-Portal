@@ -44,32 +44,52 @@ export default function LoginPage() {
       {/* Custom Premium Styles embedded directly to prevent any Tailwind conflict or outline leaks */}
       <style>{`
         .login-card {
+          position: relative !important;
           background: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
-          border-radius: 16px !important;
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 16px -8px rgba(0, 0, 0, 0.05) !important;
+          border-radius: 20px !important; /* Increased to 20px */
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 24px 48px rgba(99,102,241,0.06) !important; /* Softer layered shadow */
           padding: 40px 32px !important;
           width: 100% !important;
           max-width: 400px !important;
+          overflow: hidden !important; /* Keeps top accent bar perfectly flush */
           transition: all 0.3s ease;
+        }
+        .login-accent-bar {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          height: 3px !important;
+          background: linear-gradient(90deg, #6366f1, #818cf8) !important;
         }
         .login-input {
           width: 100% !important;
           padding: 12px 16px !important;
           font-size: 14px !important;
-          border: 1px solid #cbd5e1 !important;
-          border-radius: 8px !important;
-          background-color: #ffffff !important;
+          border: 1.5px solid #e2e8f0 !important; /* 1.5px solid #e2e8f0 */
+          border-radius: 10px !important; /* 10px */
+          background-color: #fafbfc !important; /* Soft inset feel */
           color: #0f172a !important;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
           outline: none !important;
         }
         .login-input:focus {
           border-color: #6366f1 !important;
+          background-color: #ffffff !important;
           box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
         }
         .login-input:hover {
-          border-color: #94a3b8 !important;
+          border-color: #cbd5e1 !important;
+        }
+        .field-label {
+          display: block !important;
+          font-size: 10px !important; /* 10px */
+          font-weight: 600 !important; /* 600 weight */
+          text-transform: uppercase !important; /* Small caps */
+          letter-spacing: 0.06em !important; /* 0.06em tracking */
+          color: #475569 !important; /* Color: #475569 */
+          margin-bottom: 6px !important;
         }
         .login-btn-dark {
           width: 100% !important;
@@ -78,7 +98,7 @@ export default function LoginPage() {
           font-weight: 700 !important;
           background-color: #0f172a !important;
           color: #ffffff !important;
-          border-radius: 8px !important;
+          border-radius: 10px !important; /* Increased to 10px */
           border: none !important;
           cursor: pointer !important;
           transition: background-color 0.2s ease, transform 0.1s ease !important;
@@ -95,10 +115,10 @@ export default function LoginPage() {
           padding: 10px 16px !important;
           font-size: 13px !important;
           font-weight: 600 !important;
-          background-color: #ffffff !important;
+          background-color: #fafbfc !important; /* Soft bg to match inputs */
           color: #334155 !important;
-          border: 1px solid #cbd5e1 !important;
-          border-radius: 8px !important;
+          border: 1.5px solid #e2e8f0 !important; /* 1.5px solid */
+          border-radius: 10px !important; /* 10px */
           cursor: pointer !important;
           display: flex !important;
           align-items: center !important;
@@ -109,7 +129,7 @@ export default function LoginPage() {
         }
         .login-btn-sso:hover {
           background-color: #f8fafc !important;
-          border-color: #94a3b8 !important;
+          border-color: #cbd5e1 !important;
         }
         .password-toggle-btn {
           position: absolute !important;
@@ -153,22 +173,35 @@ export default function LoginPage() {
 
       {/* Main Login Card Wrapper */}
       <div className="login-card">
-        {/* Centered Header block */}
-        <div className="flex flex-col items-center justify-center mb-8 text-center">
-          <div className="flex items-center justify-center gap-2.5 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
-              <Target className="w-6 h-6 text-white" />
+        {/* Thin Branded Accent Bar at the absolute top flush edge */}
+        <div className="login-accent-bar" />
+
+        {/* Centered Header block - Redesigned Hierarchy */}
+        <div className="flex flex-col items-center justify-center mb-5 text-center">
+          {/* logo & brand name */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
+              <Target className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">GoalPortal</h1>
+            <span className="text-lg font-bold text-slate-800 tracking-tight">GoalPortal</span>
           </div>
           
-          <p className="text-sm font-semibold text-slate-600 mb-1.5">
+          {/* Welcome back heading */}
+          <h2 className="text-xl font-bold text-slate-900 mb-1">Welcome back</h2>
+
+          {/* tagline */}
+          <p className="text-xs font-semibold text-slate-500 mb-1">
             Empowering Every Step of Your Journey
           </p>
-          <p className="text-xs text-slate-400">
+
+          {/* subtext */}
+          <p className="text-[11px] text-slate-400">
             Sign in to manage your executive dashboard
           </p>
         </div>
+
+        {/* Separation Divider Rule */}
+        <hr className="w-full border-t border-slate-100 my-5" style={{ borderTop: '1px solid #f1f5f9' }} />
 
         {error && (
           <div className="flex items-center justify-center p-3 mb-6 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold">
@@ -179,7 +212,7 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           {/* Email Address form field */}
           <div>
-            <label className="label text-slate-700 font-semibold mb-1.5 block text-xs tracking-wide">
+            <label className="field-label">
               Email Address
             </label>
             <input 
@@ -195,12 +228,12 @@ export default function LoginPage() {
           {/* Password form field with Forgot Password on the same line */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="label text-slate-700 font-semibold block text-xs tracking-wide">
+              <label className="field-label" style={{ marginBottom: 0 }}>
                 Password
               </label>
               <a 
                 href="#" 
-                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors uppercase tracking-wider"
                 onClick={(e) => e.preventDefault()}
               >
                 Forgot Password?
