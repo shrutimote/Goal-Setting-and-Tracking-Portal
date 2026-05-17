@@ -88,7 +88,7 @@ export default function ManagerDashboard() {
               <div 
                 key={member.id} 
                 className={`card cursor-pointer border-2 transition-all hover:shadow-lg ${bgClass}`}
-                onClick={() => window.location.href = `/manager/team/${member.id}`}
+                onClick={() => window.location.href = `/manager/employee/${member.id}`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
