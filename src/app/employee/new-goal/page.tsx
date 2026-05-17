@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Sparkles, Activity } from 'lucide-react'
 
 export default function NewGoal() {
-  const { user } = useAuth()
+  const { user, activeCycle } = useAuth()
   const router = useRouter()
   
   const [formData, setFormData] = useState({
@@ -73,7 +73,10 @@ export default function NewGoal() {
       const res = await fetch(`/api/goals?userId=${user?.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          parentId: activeCycle || 'GOAL_SETTING'
+        })
       })
 
       if (res.ok) {
