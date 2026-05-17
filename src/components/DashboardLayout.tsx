@@ -147,8 +147,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col max-h-screen overflow-y-auto bg-slate-900/10">
-        <header className="h-16 border-b border-border bg-slate-950/40 backdrop-blur-md flex items-center px-8 justify-between sticky top-0 z-10 shadow-sm">
-          <h1 className="text-xl font-bold capitalize text-white">{user.role.toLowerCase()} Dashboard</h1>
+        <header className="h-16 header flex items-center px-8 justify-between sticky top-0 z-10 shadow-sm">
+          <h1 className="text-xl font-bold capitalize text-slate-800">{user.role.toLowerCase()} Dashboard</h1>
           <div className="flex items-center gap-6">
             <div className={`badge ${activeCycle === 'NONE' || !activeCycle ? 'bg-slate-800 text-slate-400' : 'badge-blue'}`}>
               Active Cycle: {getCycleLabel(activeCycle)}
@@ -158,7 +158,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={handleBellClick}
-                className="relative p-2 rounded-full hover:bg-white/5 transition-all text-slate-300 focus:outline-none"
+                className="relative p-2 rounded-full hover:bg-slate-100 transition-all text-slate-600 focus:outline-none"
               >
                 <Bell className="w-6 h-6" />
                 {unreadCount > 0 && (
@@ -169,11 +169,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </button>
 
               {isOpen && (
-                <div className="absolute right-0 mt-3 w-80 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
-                  <div className="p-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
-                    <span className="font-bold text-white">Notifications</span>
+                <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-indigo-100 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
+                  <div className="p-4 border-b border-indigo-100 bg-indigo-50/50 flex items-center justify-between">
+                    <span className="font-bold text-slate-800">Notifications</span>
                     {unreadCount > 0 && (
-                      <span className="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-semibold">
+                      <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">
                         {unreadCount} new
                       </span>
                     )}
@@ -181,21 +181,21 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   
                   <div className="max-h-72 overflow-y-auto flex flex-col">
                     {notifications.length === 0 ? (
-                      <div className="py-8 text-center text-slate-500 text-sm">
+                      <div className="py-8 text-center text-slate-500 text-sm font-medium">
                         No notifications yet.
                       </div>
                     ) : (
                       notifications.map((n) => (
                         <div 
                           key={n.id} 
-                          className={`p-4 border-b border-slate-800/40 transition-colors hover:bg-white/5 ${!n.isRead ? 'bg-indigo-500/5' : ''}`}
+                          className={`p-4 border-b border-indigo-100/50 transition-colors hover:bg-indigo-50/30 ${!n.isRead ? 'bg-indigo-50/60' : ''}`}
                         >
                           <div className="flex justify-between items-start mb-1">
-                            <span className="font-bold text-sm text-white">{n.goalTitle}</span>
-                            {!n.isRead && <span className="w-2 h-2 rounded-full bg-indigo-400 shrink-0 mt-1.5" />}
+                            <span className="font-bold text-sm text-slate-800">{n.goalTitle}</span>
+                            {!n.isRead && <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 mt-1.5" />}
                           </div>
-                          <p className="text-xs text-slate-300 leading-relaxed">{n.message}</p>
-                          <span className="text-[10px] text-slate-500 block mt-2">
+                          <p className="text-xs text-slate-600 leading-relaxed font-medium">{n.message}</p>
+                          <span className="text-[10px] text-slate-400 block mt-2 font-semibold">
                             {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
