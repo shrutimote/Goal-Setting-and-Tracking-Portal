@@ -12,10 +12,93 @@ export type User = {
   managerId: string | null
 }
 
+export const DEMO_USERS: (User & { password?: string })[] = [
+  {
+    id: 'admin-id',
+    name: 'Global Admin',
+    email: 'admin@atomberg.com',
+    password: 'demo123',
+    role: 'ADMIN',
+    department: 'HR',
+    managerId: null
+  },
+  {
+    id: 'manager-sales-id',
+    name: 'Sarah (Sales Manager)',
+    email: 'manager.sales@atomberg.com',
+    password: 'demo123',
+    role: 'MANAGER',
+    department: 'Sales',
+    managerId: null
+  },
+  {
+    id: 'manager-eng-id',
+    name: 'Erica (Eng Manager)',
+    email: 'manager.eng@atomberg.com',
+    password: 'demo123',
+    role: 'MANAGER',
+    department: 'Engineering',
+    managerId: null
+  },
+  {
+    id: 'manager-ops-id',
+    name: 'Oscar (Ops Manager)',
+    email: 'manager.ops@atomberg.com',
+    password: 'demo123',
+    role: 'MANAGER',
+    department: 'Operations',
+    managerId: null
+  },
+  {
+    id: 'employee-sales1-id',
+    name: 'Alice (AE)',
+    email: 'employee.sales1@atomberg.com',
+    password: 'demo123',
+    role: 'EMPLOYEE',
+    department: 'Sales',
+    managerId: 'manager-sales-id'
+  },
+  {
+    id: 'employee-sales2-id',
+    name: 'Alex (SDR)',
+    email: 'employee.sales2@atomberg.com',
+    password: 'demo123',
+    role: 'EMPLOYEE',
+    department: 'Sales',
+    managerId: 'manager-sales-id'
+  },
+  {
+    id: 'employee-eng1-id',
+    name: 'Bob (Frontend)',
+    email: 'employee.eng1@atomberg.com',
+    password: 'demo123',
+    role: 'EMPLOYEE',
+    department: 'Engineering',
+    managerId: 'manager-eng-id'
+  },
+  {
+    id: 'employee-eng2-id',
+    name: 'Bella (Backend)',
+    email: 'employee.eng2@atomberg.com',
+    password: 'demo123',
+    role: 'EMPLOYEE',
+    department: 'Engineering',
+    managerId: 'manager-eng-id'
+  },
+  {
+    id: 'employee-ops1-id',
+    name: 'Charlie (Logistics)',
+    email: 'employee.ops1@atomberg.com',
+    password: 'demo123',
+    role: 'EMPLOYEE',
+    department: 'Operations',
+    managerId: 'manager-ops-id'
+  }
+]
+
 type AuthContextType = {
   user: User | null
-  login: (email: string, password: string) => Promise<void>
-  signup: (userData: any) => Promise<void>
+  loginUser: (userData: User) => void
   logout: () => void
   isLoading: boolean
 }
@@ -28,7 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    // Note: In a real app, validate an httpOnly session cookie instead.
     const storedUser = localStorage.getItem('secureUser')
     if (storedUser) {
       setUser(JSON.parse(storedUser))
@@ -42,56 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (role === 'ADMIN') router.push('/admin')
   }
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true)
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
-      
-      const data = await res.json()
-      
-      if (res.ok) {
-        setUser(data)
-        localStorage.setItem('secureUser', JSON.stringify(data))
-        handleRoleRedirect(data.role)
-      } else {
-        alert(data.error || 'Invalid credentials')
-      }
-    } catch (error) {
-      console.error(error)
-      alert('An error occurred during login')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const signup = async (userData: any) => {
-    setIsLoading(true)
-    try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      })
-      
-      const data = await res.json()
-      
-      if (res.ok) {
-        setUser(data)
-        localStorage.setItem('secureUser', JSON.stringify(data))
-        router.push('/employee')
-      } else {
-        alert(data.error || 'Signup failed')
-      }
-    } catch (error) {
-      console.error(error)
-      alert('An error occurred during registration')
-    } finally {
-      setIsLoading(false)
-    }
+  const loginUser = (userData: User) => {
+    setUser(userData)
+    localStorage.setItem('secureUser', JSON.stringify(userData))
+    handleRoleRedirect(userData.role)
   }
 
   const logout = () => {
@@ -101,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, loginUser, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )

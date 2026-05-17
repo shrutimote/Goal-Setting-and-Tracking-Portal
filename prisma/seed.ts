@@ -14,9 +14,10 @@ async function main() {
   console.log('Hashing passwords...')
   const passwordHash = await bcrypt.hash('demo123', 10)
 
-  console.log('Seeding System Admin...')
-  const admin = await prisma.user.create({
+  console.log('Seeding Global Admin...')
+  await prisma.user.create({
     data: {
+      id: 'admin-id',
       name: 'Global Admin',
       email: 'admin@atomberg.com',
       password: passwordHash,
@@ -26,8 +27,9 @@ async function main() {
   })
 
   console.log('Seeding Managers...')
-  const salesManager = await prisma.user.create({
+  await prisma.user.create({
     data: {
+      id: 'manager-sales-id',
       name: 'Sarah (Sales Manager)',
       email: 'manager.sales@atomberg.com',
       password: passwordHash,
@@ -36,8 +38,9 @@ async function main() {
     }
   })
 
-  const engManager = await prisma.user.create({
+  await prisma.user.create({
     data: {
+      id: 'manager-eng-id',
       name: 'Erica (Eng Manager)',
       email: 'manager.eng@atomberg.com',
       password: passwordHash,
@@ -46,8 +49,9 @@ async function main() {
     }
   })
 
-  const opsManager = await prisma.user.create({
+  await prisma.user.create({
     data: {
+      id: 'manager-ops-id',
       name: 'Oscar (Ops Manager)',
       email: 'manager.ops@atomberg.com',
       password: passwordHash,
@@ -57,52 +61,68 @@ async function main() {
   })
 
   console.log('Seeding Employees...')
-  await prisma.user.createMany({
-    data: [
-      // Sales Team
-      {
-        name: 'Alice (AE)',
-        email: 'employee.sales1@atomberg.com',
-        password: passwordHash,
-        role: 'EMPLOYEE',
-        department: 'Sales',
-        managerId: salesManager.id,
-      },
-      {
-        name: 'Alex (SDR)',
-        email: 'employee.sales2@atomberg.com',
-        password: passwordHash,
-        role: 'EMPLOYEE',
-        department: 'Sales',
-        managerId: salesManager.id,
-      },
-      // Engineering Team
-      {
-        name: 'Bob (Frontend)',
-        email: 'employee.eng1@atomberg.com',
-        password: passwordHash,
-        role: 'EMPLOYEE',
-        department: 'Engineering',
-        managerId: engManager.id,
-      },
-      {
-        name: 'Bella (Backend)',
-        email: 'employee.eng2@atomberg.com',
-        password: passwordHash,
-        role: 'EMPLOYEE',
-        department: 'Engineering',
-        managerId: engManager.id,
-      },
-      // Operations Team
-      {
-        name: 'Charlie (Logistics)',
-        email: 'employee.ops1@atomberg.com',
-        password: passwordHash,
-        role: 'EMPLOYEE',
-        department: 'Operations',
-        managerId: opsManager.id,
-      }
-    ]
+  
+  // Sales Team
+  await prisma.user.create({
+    data: {
+      id: 'employee-sales1-id',
+      name: 'Alice (AE)',
+      email: 'employee.sales1@atomberg.com',
+      password: passwordHash,
+      role: 'EMPLOYEE',
+      department: 'Sales',
+      managerId: 'manager-sales-id',
+    }
+  })
+
+  await prisma.user.create({
+    data: {
+      id: 'employee-sales2-id',
+      name: 'Alex (SDR)',
+      email: 'employee.sales2@atomberg.com',
+      password: passwordHash,
+      role: 'EMPLOYEE',
+      department: 'Sales',
+      managerId: 'manager-sales-id',
+    }
+  })
+
+  // Engineering Team
+  await prisma.user.create({
+    data: {
+      id: 'employee-eng1-id',
+      name: 'Bob (Frontend)',
+      email: 'employee.eng1@atomberg.com',
+      password: passwordHash,
+      role: 'EMPLOYEE',
+      department: 'Engineering',
+      managerId: 'manager-eng-id',
+    }
+  })
+
+  await prisma.user.create({
+    data: {
+      id: 'employee-eng2-id',
+      name: 'Bella (Backend)',
+      email: 'employee.eng2@atomberg.com',
+      password: passwordHash,
+      role: 'EMPLOYEE',
+      department: 'Engineering',
+      managerId: 'manager-eng-id',
+    }
+  })
+
+  // Operations Team
+  await prisma.user.create({
+    data: {
+      id: 'employee-ops1-id',
+      name: 'Charlie (Logistics)',
+      email: 'employee.ops1@atomberg.com',
+      password: passwordHash,
+      role: 'EMPLOYEE',
+      department: 'Operations',
+      managerId: 'manager-ops-id',
+    }
   })
 
   console.log('Seeding default escalation rule...')
@@ -115,7 +135,7 @@ async function main() {
     }
   })
 
-  console.log('Seeding complete! (All passwords are "demo123")')
+  console.log('Seeding complete! (All passwords are "demo123" and IDs are hardcoded)')
 }
 
 main()
