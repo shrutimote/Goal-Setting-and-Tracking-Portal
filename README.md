@@ -2,23 +2,20 @@
 
 A centralized portal where employees set and track their goals, managers monitor team progress in real time, and HR maintains full organizational oversight. Role-based dashboards keep every stakeholder aligned — turning performance management from an annual formality into a continuous, transparent, and results-driven process.
 
-## Local Development Test Credentials
+## Demo Login Credentials
 
-This application uses a PostgreSQL database. The authentication system uses `bcryptjs` for secure password hashing.
+Below are the pre-seeded demo accounts configured for this portal. This is a pre-populated Demo Environment with no registration required.
 
-| Role | Department | Email | Password |
-| :--- | :--- | :--- | :--- |
-| **Admin (HR)** | HR | `admin@atomberg.com` | `demo123` |
-| **Manager** | Sales | `manager.sales@atomberg.com` | `demo123` |
-| **Manager** | Engineering | `manager.eng@atomberg.com` | `demo123` |
-| **Manager** | Operations | `manager.ops@atomberg.com` | `demo123` |
-| **Employee** | Sales | `employee.sales1@atomberg.com` | `demo123` |
-| **Employee** | Sales | `employee.sales2@atomberg.com` | `demo123` |
-| **Employee** | Engineering | `employee.eng1@atomberg.com` | `demo123` |
-| **Employee** | Engineering | `employee.eng2@atomberg.com` | `demo123` |
-| **Employee** | Operations | `employee.ops1@atomberg.com` | `demo123` |
-
-*(Note: There is no manual sign-up flow. The portal is configured strictly as a pre-populated Demo Environment.)*
+| Name | Role | Team / Dept | Email | Password |
+| :--- | :--- | :--- | :--- | :--- |
+| **Rajesh Sharma** | ADMIN | HR | `admin@company.com` | `admin123` |
+| **Priya Menon** | MANAGER | Alpha | `manager.alpha@company.com` | `manager123` |
+| **Arjun Desai** | MANAGER | Beta | `manager.beta@company.com` | `manager123` |
+| **Sneha Patil** | EMPLOYEE | Alpha (Engineering) | `emp1@company.com` | `emp123` |
+| **Rohit Joshi** | EMPLOYEE | Alpha (Engineering) | `emp2@company.com` | `emp123` |
+| **Kavya Nair** | EMPLOYEE | Alpha (Design) | `emp3@company.com` | `emp123` |
+| **Amit Kulkarni** | EMPLOYEE | Beta (Marketing) | `emp4@company.com` | `emp123` |
+| **Divya Rao** | EMPLOYEE | Beta (Sales) | `emp5@company.com` | `emp123` |
 
 ## Deploying to Render (Production)
 

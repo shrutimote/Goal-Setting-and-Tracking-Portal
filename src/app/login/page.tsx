@@ -3,7 +3,7 @@
 import { useAuth, DEMO_USERS } from '@/components/AuthProvider'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Eye, EyeOff, Target, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Target } from 'lucide-react'
 
 export default function LoginPage() {
   const { user, loginUser, isLoading } = useAuth()
@@ -33,14 +33,14 @@ export default function LoginPage() {
       const { password: _, ...safeUser } = foundUser
       loginUser(safeUser)
     } else {
-      setError('Invalid credentials. Please verify your email and password.')
+      setError('Invalid credentials')
     }
   }
 
   if (isLoading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-12">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="card w-full mb-8 shadow-xl border border-slate-200" style={{ maxWidth: '420px' }}>
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -50,8 +50,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2 p-3.5 mb-6 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium">
-            <AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
+          <div className="flex items-center justify-center p-3 mb-6 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold">
             <span>{error}</span>
           </div>
         )}
@@ -98,21 +97,9 @@ export default function LoginPage() {
 
         <div className="text-center pt-4 border-t border-slate-100">
           <p className="text-sm font-medium text-slate-500">
-            Don't have an account? <span className="text-slate-600 font-bold">Contact your manager.</span>
+            Don't have an account? <span className="text-slate-600 font-semibold">Contact your manager.</span>
           </p>
         </div>
-      </div>
-      
-      {/* Help Card for Testing */}
-      <div className="card w-full bg-slate-50 border border-dashed border-slate-200 text-center" style={{ maxWidth: '420px' }}>
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Demo Credentials</p>
-        <p className="text-xs font-semibold text-slate-600">
-          Admin: <code className="bg-slate-200 px-1 py-0.5 rounded">admin@atomberg.com</code><br/>
-          Sales Mgr: <code className="bg-slate-200 px-1 py-0.5 rounded">manager.sales@atomberg.com</code><br/>
-          Eng Mgr: <code className="bg-slate-200 px-1 py-0.5 rounded">manager.eng@atomberg.com</code><br/>
-          Employee: <code className="bg-slate-200 px-1 py-0.5 rounded">employee.sales1@atomberg.com</code>
-        </p>
-        <p className="text-[10px] text-slate-400 font-medium mt-2">All passwords are: <code className="bg-slate-200 px-1 py-0.5 rounded">demo123</code></p>
       </div>
     </div>
   )

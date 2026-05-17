@@ -2,99 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { User } from '@/lib/demo-users'
 
-export type User = {
-  id: string
-  name: string
-  email: string
-  role: 'EMPLOYEE' | 'MANAGER' | 'ADMIN'
-  department: string | null
-  managerId: string | null
-}
-
-export const DEMO_USERS: (User & { password?: string })[] = [
-  {
-    id: 'admin-id',
-    name: 'Global Admin',
-    email: 'admin@atomberg.com',
-    password: 'demo123',
-    role: 'ADMIN',
-    department: 'HR',
-    managerId: null
-  },
-  {
-    id: 'manager-sales-id',
-    name: 'Sarah (Sales Manager)',
-    email: 'manager.sales@atomberg.com',
-    password: 'demo123',
-    role: 'MANAGER',
-    department: 'Sales',
-    managerId: null
-  },
-  {
-    id: 'manager-eng-id',
-    name: 'Erica (Eng Manager)',
-    email: 'manager.eng@atomberg.com',
-    password: 'demo123',
-    role: 'MANAGER',
-    department: 'Engineering',
-    managerId: null
-  },
-  {
-    id: 'manager-ops-id',
-    name: 'Oscar (Ops Manager)',
-    email: 'manager.ops@atomberg.com',
-    password: 'demo123',
-    role: 'MANAGER',
-    department: 'Operations',
-    managerId: null
-  },
-  {
-    id: 'employee-sales1-id',
-    name: 'Alice (AE)',
-    email: 'employee.sales1@atomberg.com',
-    password: 'demo123',
-    role: 'EMPLOYEE',
-    department: 'Sales',
-    managerId: 'manager-sales-id'
-  },
-  {
-    id: 'employee-sales2-id',
-    name: 'Alex (SDR)',
-    email: 'employee.sales2@atomberg.com',
-    password: 'demo123',
-    role: 'EMPLOYEE',
-    department: 'Sales',
-    managerId: 'manager-sales-id'
-  },
-  {
-    id: 'employee-eng1-id',
-    name: 'Bob (Frontend)',
-    email: 'employee.eng1@atomberg.com',
-    password: 'demo123',
-    role: 'EMPLOYEE',
-    department: 'Engineering',
-    managerId: 'manager-eng-id'
-  },
-  {
-    id: 'employee-eng2-id',
-    name: 'Bella (Backend)',
-    email: 'employee.eng2@atomberg.com',
-    password: 'demo123',
-    role: 'EMPLOYEE',
-    department: 'Engineering',
-    managerId: 'manager-eng-id'
-  },
-  {
-    id: 'employee-ops1-id',
-    name: 'Charlie (Logistics)',
-    email: 'employee.ops1@atomberg.com',
-    password: 'demo123',
-    role: 'EMPLOYEE',
-    department: 'Operations',
-    managerId: 'manager-ops-id'
-  }
-]
+export type { User } from '@/lib/demo-users'
+export { DEMO_USERS } from '@/lib/demo-users'
 
 type AuthContextType = {
   user: User | null

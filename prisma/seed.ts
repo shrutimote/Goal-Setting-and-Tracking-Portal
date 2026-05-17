@@ -12,15 +12,17 @@ async function main() {
   await prisma.user.deleteMany()
 
   console.log('Hashing passwords...')
-  const passwordHash = await bcrypt.hash('demo123', 10)
+  const hashedAdminPassword = await bcrypt.hash('admin123', 10)
+  const hashedManagerPassword = await bcrypt.hash('manager123', 10)
+  const hashedEmployeePassword = await bcrypt.hash('emp123', 10)
 
   console.log('Seeding Global Admin...')
   await prisma.user.create({
     data: {
       id: 'admin-id',
-      name: 'Global Admin',
-      email: 'admin@atomberg.com',
-      password: passwordHash,
+      name: 'Rajesh Sharma',
+      email: 'admin@company.com',
+      password: hashedAdminPassword,
       role: 'ADMIN',
       department: 'HR',
     }
@@ -29,99 +31,87 @@ async function main() {
   console.log('Seeding Managers...')
   await prisma.user.create({
     data: {
-      id: 'manager-sales-id',
-      name: 'Sarah (Sales Manager)',
-      email: 'manager.sales@atomberg.com',
-      password: passwordHash,
+      id: 'manager-alpha-id',
+      name: 'Priya Menon',
+      email: 'manager.alpha@company.com',
+      password: hashedManagerPassword,
       role: 'MANAGER',
-      department: 'Sales',
+      department: 'Alpha',
     }
   })
 
   await prisma.user.create({
     data: {
-      id: 'manager-eng-id',
-      name: 'Erica (Eng Manager)',
-      email: 'manager.eng@atomberg.com',
-      password: passwordHash,
+      id: 'manager-beta-id',
+      name: 'Arjun Desai',
+      email: 'manager.beta@company.com',
+      password: hashedManagerPassword,
       role: 'MANAGER',
-      department: 'Engineering',
-    }
-  })
-
-  await prisma.user.create({
-    data: {
-      id: 'manager-ops-id',
-      name: 'Oscar (Ops Manager)',
-      email: 'manager.ops@atomberg.com',
-      password: passwordHash,
-      role: 'MANAGER',
-      department: 'Operations',
+      department: 'Beta',
     }
   })
 
   console.log('Seeding Employees...')
   
-  // Sales Team
+  // Team Alpha (Priya Menon)
   await prisma.user.create({
     data: {
-      id: 'employee-sales1-id',
-      name: 'Alice (AE)',
-      email: 'employee.sales1@atomberg.com',
-      password: passwordHash,
-      role: 'EMPLOYEE',
-      department: 'Sales',
-      managerId: 'manager-sales-id',
-    }
-  })
-
-  await prisma.user.create({
-    data: {
-      id: 'employee-sales2-id',
-      name: 'Alex (SDR)',
-      email: 'employee.sales2@atomberg.com',
-      password: passwordHash,
-      role: 'EMPLOYEE',
-      department: 'Sales',
-      managerId: 'manager-sales-id',
-    }
-  })
-
-  // Engineering Team
-  await prisma.user.create({
-    data: {
-      id: 'employee-eng1-id',
-      name: 'Bob (Frontend)',
-      email: 'employee.eng1@atomberg.com',
-      password: passwordHash,
+      id: 'emp1-id',
+      name: 'Sneha Patil',
+      email: 'emp1@company.com',
+      password: hashedEmployeePassword,
       role: 'EMPLOYEE',
       department: 'Engineering',
-      managerId: 'manager-eng-id',
+      managerId: 'manager-alpha-id',
     }
   })
 
   await prisma.user.create({
     data: {
-      id: 'employee-eng2-id',
-      name: 'Bella (Backend)',
-      email: 'employee.eng2@atomberg.com',
-      password: passwordHash,
+      id: 'emp2-id',
+      name: 'Rohit Joshi',
+      email: 'emp2@company.com',
+      password: hashedEmployeePassword,
       role: 'EMPLOYEE',
       department: 'Engineering',
-      managerId: 'manager-eng-id',
+      managerId: 'manager-alpha-id',
     }
   })
 
-  // Operations Team
   await prisma.user.create({
     data: {
-      id: 'employee-ops1-id',
-      name: 'Charlie (Logistics)',
-      email: 'employee.ops1@atomberg.com',
-      password: passwordHash,
+      id: 'emp3-id',
+      name: 'Kavya Nair',
+      email: 'emp3@company.com',
+      password: hashedEmployeePassword,
       role: 'EMPLOYEE',
-      department: 'Operations',
-      managerId: 'manager-ops-id',
+      department: 'Design',
+      managerId: 'manager-alpha-id',
+    }
+  })
+
+  // Team Beta (Arjun Desai)
+  await prisma.user.create({
+    data: {
+      id: 'emp4-id',
+      name: 'Amit Kulkarni',
+      email: 'emp4@company.com',
+      password: hashedEmployeePassword,
+      role: 'EMPLOYEE',
+      department: 'Marketing',
+      managerId: 'manager-beta-id',
+    }
+  })
+
+  await prisma.user.create({
+    data: {
+      id: 'emp5-id',
+      name: 'Divya Rao',
+      email: 'emp5@company.com',
+      password: hashedEmployeePassword,
+      role: 'EMPLOYEE',
+      department: 'Sales',
+      managerId: 'manager-beta-id',
     }
   })
 
@@ -135,7 +125,7 @@ async function main() {
     }
   })
 
-  console.log('Seeding complete! (All passwords are "demo123" and IDs are hardcoded)')
+  console.log('Seeding complete! (All demo passwords and accounts are aligned with original requirements)')
 }
 
 main()
