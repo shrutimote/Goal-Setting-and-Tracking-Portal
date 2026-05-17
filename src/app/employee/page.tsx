@@ -80,15 +80,20 @@ export default function EmployeeDashboard() {
   if (pendingCount > 0) statusText = 'Awaiting approvals'
   else if (totalGoals === 0) statusText = 'Drafting open'
 
+  // Determine accent bar color dynamically for Issue 1 Status card
+  const statusAccentColor = statusText === 'Awaiting approvals' ? '#d97706' : '#16a34a'
+
   return (
     <DashboardLayout>
+      
+      {/* Header section with brand colored primary add button */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">My Dashboard</h2>
           <p className="text-sm text-slate-400 font-medium mt-1">Manage your performance objectives and track progress.</p>
         </div>
         
-        {/* Issue 6: + Add New Goal button customized to match login page primary */}
+        {/* Issue 4: + Add New Goal button styled cleanly to match primary login page actions */}
         <button 
           className="transition-all"
           style={{ 
@@ -121,8 +126,9 @@ export default function EmployeeDashboard() {
         </div>
       ) : (
         <>
-          {/* Issue 3: Stat Cards designed with borders, white background and left colored stripe */}
+          {/* Issue 1: Stat Cards polished with top accented color bar */}
           <div className="grid grid-cols-3 gap-6 mb-8">
+            
             {/* Total Goals Card */}
             <div 
               className="flex flex-col relative overflow-hidden" 
@@ -130,12 +136,13 @@ export default function EmployeeDashboard() {
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
-                padding: '24px', 
-                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+                padding: '20px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
+                boxSizing: 'border-box'
               }}
             >
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#6366f1' }} />
-              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '8px' }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '3px', backgroundColor: '#4f46e5' }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#94a3b8', marginBottom: '8px', marginTop: '4px' }}>
                 Total Goals
               </h3>
               <p style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
@@ -150,12 +157,13 @@ export default function EmployeeDashboard() {
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
-                padding: '24px', 
-                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+                padding: '20px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
+                boxSizing: 'border-box'
               }}
             >
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#8b5cf6' }} />
-              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '8px' }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '3px', backgroundColor: '#7c3aed' }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#94a3b8', marginBottom: '8px', marginTop: '4px' }}>
                 Total Weightage
               </h3>
               <p style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
@@ -163,32 +171,33 @@ export default function EmployeeDashboard() {
               </p>
             </div>
 
-            {/* Status Card - Issue 4: drafting status rendered as a pill badge */}
+            {/* Status Card */}
             <div 
               className="flex flex-col relative overflow-hidden" 
               style={{ 
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
-                padding: '24px', 
-                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+                padding: '20px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
+                boxSizing: 'border-box'
               }}
             >
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#10b981' }} />
-              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '12px' }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '3px', backgroundColor: statusAccentColor }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#94a3b8', marginBottom: '12px', marginTop: '4px' }}>
                 Status
               </h3>
               <div className="flex items-center">
                 {statusText === 'Drafting open' ? (
-                  <span style={{ backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                  <span style={{ backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
                     Drafting open
                   </span>
                 ) : statusText === 'Awaiting approvals' ? (
-                  <span style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fef3c7', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                  <span style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
                     Awaiting approvals
                   </span>
                 ) : (
-                  <span style={{ backgroundColor: '#f5f3ff', color: '#6d28d9', border: '1px solid #ddd6fe', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                  <span style={{ backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
                     Lock & Active
                   </span>
                 )}
@@ -198,12 +207,15 @@ export default function EmployeeDashboard() {
 
           <WhatIfSimulator goals={enrichedGoals} />
 
-          <h3 className="text-lg font-bold text-slate-800 mb-4 mt-8">Goal Health Tracker</h3>
+          {/* Issue 6: Section titles consistent styling */}
+          <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '14px', marginTop: '32px' }}>
+            Goal Health Tracker
+          </h3>
+          
           {isLoading ? (
             <p className="text-slate-500 font-medium">Loading goals...</p>
           ) : enrichedGoals.length === 0 ? (
             
-            /* Issue 7: Goal Health Tracker empty state card styled with Target icon and outline button */
             <div 
               className="text-center py-12 flex flex-col items-center justify-center"
               style={{ 
@@ -215,7 +227,6 @@ export default function EmployeeDashboard() {
               }}
             >
               <Target className="w-8 h-8 text-slate-300 mb-3" />
-              
               <p style={{ color: '#94a3b8', fontSize: '14px', fontWeight: 500, marginBottom: '16px' }}>
                 You haven't set any goals for this cycle yet.
               </p>

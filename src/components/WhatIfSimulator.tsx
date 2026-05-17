@@ -28,38 +28,125 @@ export function WhatIfSimulator({ goals }: { goals: any[] }) {
   }
 
   return (
-    <div className="card bg-indigo-50 border-indigo-200 mb-8 mt-8">
-      <h3 className="text-lg font-bold text-indigo-900 mb-2">What-If Simulator</h3>
-      <p className="text-sm text-indigo-700 mb-6">Drag the sliders to see how your actual achievements will impact your overall weighted score.</p>
+    <div 
+      style={{
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        borderRadius: '14px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
+        marginBottom: '32px',
+        marginTop: '32px',
+        boxSizing: 'border-box'
+      }}
+    >
+      {/* Header section with left accent indigo border */}
+      <h3 
+        style={{ 
+          fontSize: '15px', 
+          fontWeight: 700, 
+          color: '#0f172a', 
+          borderLeft: '3px solid #4f46e5', 
+          paddingLeft: '12px', 
+          margin: 0 
+        }}
+      >
+        What-If Simulator
+      </h3>
+      <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 20px 0' }}>
+        Drag the sliders to see how your actual achievements will impact your overall weighted score.
+      </p>
       
-      <div className="flex gap-8">
-        <div className="flex-1 flex flex-col gap-4">
+      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {goals.filter(g => g.uom !== 'TIMELINE').map(g => (
-            <div key={g.id}>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-medium text-indigo-900">{g.title}</span>
-                <span className="text-indigo-700">Target: {g.target} (Wt: {g.weightage}%)</span>
+            <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              
+              {/* Slider header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span 
+                  style={{ 
+                    fontSize: '13px', 
+                    fontWeight: 600, 
+                    color: '#475569', 
+                    overflow: 'hidden', 
+                    textOverflow: 'ellipsis', 
+                    whiteSpace: 'nowrap', 
+                    maxWidth: '70%',
+                    display: 'inline-block' 
+                  }}
+                  title={g.title}
+                >
+                  {g.title}
+                </span>
+                
+                {/* Target & Wt small double labeled rows */}
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ display: 'block', fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Target</span>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{g.target}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ display: 'block', fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Wt</span>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{g.weightage}%</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
+
+              {/* Slider line */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <input 
                   type="range" 
-                  className="w-full"
+                  style={{ 
+                    width: '100%', 
+                    accentColor: '#4f46e5',
+                    cursor: 'pointer'
+                  }}
                   min="0"
                   max={parseFloat(g.target) * 1.5 || 100}
                   value={simulatedActuals[g.id] || 0}
                   onChange={e => setSimulatedActuals({...simulatedActuals, [g.id]: parseFloat(e.target.value)})}
                 />
-                <span className="font-bold text-indigo-900 w-12 text-right">
+                
+                {/* Current Value */}
+                <span 
+                  style={{ 
+                    fontSize: '14px', 
+                    fontWeight: 700, 
+                    color: '#0f172a', 
+                    width: '48px', 
+                    textAlign: 'right',
+                    flexShrink: 0
+                  }}
+                >
                   {simulatedActuals[g.id] || 0}
                 </span>
               </div>
+
             </div>
           ))}
         </div>
         
-        <div className="w-48 flex flex-col items-center justify-center bg-white rounded-lg p-4 border border-indigo-100 shadow-sm">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Projected Score</p>
-          <div className="text-5xl font-bold text-indigo-600">
+        {/* Projected Score card right block */}
+        <div 
+          style={{ 
+            width: '192px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            backgroundColor: '#fafbfc', 
+            borderRadius: '10px', 
+            padding: '20px', 
+            border: '1px solid #e2e8f0', 
+            flexShrink: 0,
+            boxSizing: 'border-box'
+          }}
+        >
+          <p style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#94a3b8', margin: '0 0 4px 0', letterSpacing: '0.07em' }}>
+            PROJECTED SCORE
+          </p>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#4f46e5' }}>
             {calculateTotalScore()}%
           </div>
         </div>
