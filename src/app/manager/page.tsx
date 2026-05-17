@@ -3,11 +3,24 @@
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { useAuth, User } from '@/components/AuthProvider'
 import { useState, useEffect } from 'react'
+import { X, Send, CheckCircle2, AlertTriangle, Target } from 'lucide-react'
 
 export default function ManagerDashboard() {
   const { user } = useAuth()
   const [team, setTeam] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  // Push Template Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [templateTitle, setTemplateTitle] = useState('')
+  const [templateDesc, setTemplateDesc] = useState('')
+  const [templateThrust, setTemplateThrust] = useState('Core KPI')
+  const [templateUom, setTemplateUom] = useState('Percent')
+  const [templateTarget, setTemplateTarget] = useState('100')
+  const [templateWeightage, setTemplateWeightage] = useState('15')
+  const [isPushing, setIsPushing] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -29,6 +42,46 @@ export default function ManagerDashboard() {
     }
   }
 
+  const handlePushTemplate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+    setIsPushing(true)
+
+    try {
+      const res = await fetch(`/api/goals/template?managerId=${user?.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: templateTitle,
+          description: templateDesc,
+          thrustArea: templateThrust,
+          uom: templateUom,
+          target: templateTarget,
+          weightage: templateWeightage,
+        })
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setSuccessMsg(`Goal successfully pushed to all ${data.pushedCount} team members!`)
+        setIsModalOpen(false)
+        // Reset fields
+        setTemplateTitle('')
+        setTemplateDesc('')
+        setTemplateTarget('100')
+        setTemplateWeightage('15')
+      } else {
+        setErrorMsg(data.error || 'Failed to push goal template')
+      }
+    } catch (err: any) {
+      setErrorMsg('An error occurred. Please try again.')
+    } finally {
+      setIsPushing(false)
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
@@ -36,8 +89,24 @@ export default function ManagerDashboard() {
           <h2 className="text-2xl font-bold">Manager War Room</h2>
           <p className="text-muted-foreground">Real-time health overview of your entire team's goals.</p>
         </div>
-        <button className="btn btn-primary bg-indigo-600 hover:bg-indigo-700">Push Goal Template</button>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn btn-primary bg-indigo-600 hover:bg-indigo-700 font-bold transition-all shadow-md shadow-indigo-500/20"
+        >
+          Push Goal Template
+        </button>
       </div>
+
+      {/* Dynamic Success Alert Banner */}
+      {successMsg && (
+        <div className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold animate-in fade-in slide-in-from-top duration-300">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span>{successMsg}</span>
+          <button onClick={() => setSuccessMsg('')} className="ml-auto text-emerald-500 hover:text-emerald-700">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-4 gap-6 mb-8">
         <div className="card">
@@ -100,7 +169,6 @@ export default function ManagerDashboard() {
                 
                 <div className="flex justify-between items-center mt-6 pt-4 border-t border-black/10">
                   <div className="flex -space-x-2">
-                    {/* Mock goal circles */}
                     <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">1</div>
                     <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">2</div>
                     <div className="w-6 h-6 rounded-full bg-white/60 border border-black/10 flex items-center justify-center text-[10px]">3</div>
@@ -112,6 +180,126 @@ export default function ManagerDashboard() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Push Goal Template Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-lg border border-slate-200 animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Target className="w-6 h-6 text-indigo-600" />
+                <h3 className="text-xl font-bold text-slate-800">Push Team Goal Template</h3>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {errorMsg && (
+              <div className="flex items-start gap-2 p-3 mt-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium">
+                <AlertTriangle className="w-5 h-5 shrink-0 text-rose-500" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handlePushTemplate} className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
+              <div>
+                <label className="label text-slate-700 font-semibold mb-1 block">Goal Title</label>
+                <input 
+                  type="text" 
+                  className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5" 
+                  placeholder="e.g. Complete Q2 Security Training" 
+                  value={templateTitle}
+                  onChange={(e) => setTemplateTitle(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label text-slate-700 font-semibold mb-1 block">Description</label>
+                <textarea 
+                  className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5 h-20 resize-none" 
+                  placeholder="Provide context and key instructions..." 
+                  value={templateDesc}
+                  onChange={(e) => setTemplateDesc(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label text-slate-700 font-semibold mb-1 block">Thrust Area</label>
+                  <input 
+                    type="text" 
+                    className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5" 
+                    value={templateThrust}
+                    onChange={(e) => setTemplateThrust(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="label text-slate-700 font-semibold mb-1 block">Unit of Measure</label>
+                  <select 
+                    className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5 bg-white"
+                    value={templateUom}
+                    onChange={(e) => setTemplateUom(e.target.value)}
+                  >
+                    <option value="Numeric">Numeric</option>
+                    <option value="Percent">Percent</option>
+                    <option value="Timeline">Timeline</option>
+                    <option value="Zero-Based">Zero-Based</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label text-slate-700 font-semibold mb-1 block">Target</label>
+                  <input 
+                    type="text" 
+                    className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5" 
+                    value={templateTarget}
+                    onChange={(e) => setTemplateTarget(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="label text-slate-700 font-semibold mb-1 block">Weightage (%)</label>
+                  <input 
+                    type="number" 
+                    min="10" 
+                    max="100"
+                    className="input w-full border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg p-2.5" 
+                    value={templateWeightage}
+                    onChange={(e) => setTemplateWeightage(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex gap-3 mt-auto">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="btn border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-lg flex-1 font-medium transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isPushing}
+                  className="btn btn-primary bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg flex-1 font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
+                >
+                  <Send className="w-4 h-4" />
+                  {isPushing ? 'Pushing...' : 'Push to Team'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </DashboardLayout>
