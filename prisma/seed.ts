@@ -12,41 +12,97 @@ async function main() {
   await prisma.user.deleteMany()
 
   console.log('Hashing passwords...')
-  const hashedAdminPassword = await bcrypt.hash('admin123', 10)
-  const hashedManagerPassword = await bcrypt.hash('manager123', 10)
-  const hashedEmployeePassword = await bcrypt.hash('employee123', 10)
+  const passwordHash = await bcrypt.hash('demo123', 10)
 
-  console.log('Seeding users...')
-  
+  console.log('Seeding System Admin...')
   const admin = await prisma.user.create({
     data: {
-      name: 'System Admin',
+      name: 'Global Admin',
       email: 'admin@atomberg.com',
-      password: hashedAdminPassword,
+      password: passwordHash,
       role: 'ADMIN',
       department: 'HR',
     }
   })
 
-  const manager = await prisma.user.create({
+  console.log('Seeding Managers...')
+  const salesManager = await prisma.user.create({
     data: {
-      name: 'Sales Manager',
-      email: 'manager@atomberg.com',
-      password: hashedManagerPassword,
+      name: 'Sarah (Sales Manager)',
+      email: 'manager.sales@atomberg.com',
+      password: passwordHash,
       role: 'MANAGER',
       department: 'Sales',
     }
   })
 
-  const employee = await prisma.user.create({
+  const engManager = await prisma.user.create({
     data: {
-      name: 'Test Employee',
-      email: 'employee@atomberg.com',
-      password: hashedEmployeePassword,
-      role: 'EMPLOYEE',
-      department: 'Sales',
-      managerId: manager.id,
+      name: 'Erica (Eng Manager)',
+      email: 'manager.eng@atomberg.com',
+      password: passwordHash,
+      role: 'MANAGER',
+      department: 'Engineering',
     }
+  })
+
+  const opsManager = await prisma.user.create({
+    data: {
+      name: 'Oscar (Ops Manager)',
+      email: 'manager.ops@atomberg.com',
+      password: passwordHash,
+      role: 'MANAGER',
+      department: 'Operations',
+    }
+  })
+
+  console.log('Seeding Employees...')
+  await prisma.user.createMany({
+    data: [
+      // Sales Team
+      {
+        name: 'Alice (AE)',
+        email: 'employee.sales1@atomberg.com',
+        password: passwordHash,
+        role: 'EMPLOYEE',
+        department: 'Sales',
+        managerId: salesManager.id,
+      },
+      {
+        name: 'Alex (SDR)',
+        email: 'employee.sales2@atomberg.com',
+        password: passwordHash,
+        role: 'EMPLOYEE',
+        department: 'Sales',
+        managerId: salesManager.id,
+      },
+      // Engineering Team
+      {
+        name: 'Bob (Frontend)',
+        email: 'employee.eng1@atomberg.com',
+        password: passwordHash,
+        role: 'EMPLOYEE',
+        department: 'Engineering',
+        managerId: engManager.id,
+      },
+      {
+        name: 'Bella (Backend)',
+        email: 'employee.eng2@atomberg.com',
+        password: passwordHash,
+        role: 'EMPLOYEE',
+        department: 'Engineering',
+        managerId: engManager.id,
+      },
+      // Operations Team
+      {
+        name: 'Charlie (Logistics)',
+        email: 'employee.ops1@atomberg.com',
+        password: passwordHash,
+        role: 'EMPLOYEE',
+        department: 'Operations',
+        managerId: opsManager.id,
+      }
+    ]
   })
 
   console.log('Seeding default escalation rule...')
@@ -59,11 +115,7 @@ async function main() {
     }
   })
 
-  console.log('Seeding complete!')
-  console.log('--- TEST CREDENTIALS ---')
-  console.log('Admin: admin@atomberg.com / admin123')
-  console.log('Manager: manager@atomberg.com / manager123')
-  console.log('Employee: employee@atomberg.com / employee123')
+  console.log('Seeding complete! (All passwords are "demo123")')
 }
 
 main()

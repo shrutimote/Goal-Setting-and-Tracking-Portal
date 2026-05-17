@@ -6,17 +6,19 @@ A centralized portal where employees set and track their goals, managers monitor
 
 This application uses a PostgreSQL database. The authentication system uses `bcryptjs` for secure password hashing.
 
-You can use the following pre-seeded test accounts to test the different role-based views in the system:
-
-| Role | Email | Password | Dashboard Route |
+| Role | Department | Email | Password |
 | :--- | :--- | :--- | :--- |
-| **Admin (HR)** | `admin@atomberg.com` | `admin123` | `/admin` |
-| **Manager** | `manager@atomberg.com` | `manager123` | `/manager` |
-| **Employee** | `employee@atomberg.com` | `employee123` | `/employee` |
+| **Admin (HR)** | HR | `admin@atomberg.com` | `demo123` |
+| **Manager** | Sales | `manager.sales@atomberg.com` | `demo123` |
+| **Manager** | Engineering | `manager.eng@atomberg.com` | `demo123` |
+| **Manager** | Operations | `manager.ops@atomberg.com` | `demo123` |
+| **Employee** | Sales | `employee.sales1@atomberg.com` | `demo123` |
+| **Employee** | Sales | `employee.sales2@atomberg.com` | `demo123` |
+| **Employee** | Engineering | `employee.eng1@atomberg.com` | `demo123` |
+| **Employee** | Engineering | `employee.eng2@atomberg.com` | `demo123` |
+| **Employee** | Operations | `employee.ops1@atomberg.com` | `demo123` |
 
-### New Employees
-You can create a brand new Employee account by navigating to `/signup`. 
-*(Note: Managers and Admins cannot be self-registered and must be created via the database seed or an admin console).*
+*(Note: There is no manual sign-up flow. The portal is configured strictly as a pre-populated Demo Environment.)*
 
 ## Deploying to Render (Production)
 
