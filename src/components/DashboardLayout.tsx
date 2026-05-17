@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from '@/components/AuthProvider'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { LogOut, LayoutDashboard, Target, Activity, AlertTriangle, Bell, Check, X } from 'lucide-react'
@@ -10,6 +10,7 @@ import { getNotifications, markNotificationsAsRead, Notification } from '@/lib/n
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isLoading, activeCycle } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -29,7 +30,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchNotifications()
     
-    // Listen to custom custom-events for real-time notifications refresh
+    // Listen to custom events for real-time notifications refresh
     window.addEventListener('notifications-updated', fetchNotifications)
     return () => {
       window.removeEventListener('notifications-updated', fetchNotifications)
@@ -75,85 +76,218 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return cycle
   }
 
+  // Issue 2 dynamic route highlight helpers
+  const isDashboardActive = pathname === '/employee' || pathname === '/manager' || pathname === '/admin'
+  const isGoalsActive = pathname === '/employee/goals' || pathname === '/dashboard/employee/goals'
+  const isAnalyticsActive = pathname === '/admin/analytics'
+  const isEscalationsActive = pathname === '/admin/escalations'
+
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar - Premium Dark Theme */}
-      <aside className="w-64 bg-[#0f172a] text-slate-300 border-r border-[#1e293b] flex flex-col shadow-xl z-20">
-        <div className="p-6 border-b border-[#1e293b]">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+      {/* 
+        Issue 2 - Sidebar: 
+        Solid white background (#ffffff), 1px solid #e2e8f0 right border, 
+        and clean f1f5f9 dividers at the top/bottom boundary zones.
+      */}
+      <aside 
+        className="w-64 flex flex-col z-20 shrink-0"
+        style={{ 
+          backgroundColor: '#ffffff', 
+          borderRight: '1px solid #e2e8f0',
+          color: '#64748b'
+        }}
+      >
+        {/* Logo area */}
+        <div className="p-6" style={{ borderBottom: '1px solid #f1f5f9' }}>
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: '#0f172a' }}>
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
               <Target className="w-5 h-5 text-white" />
             </div>
             GoalPortal
           </h2>
         </div>
-        <nav className="flex-1 p-4 flex flex-col gap-2 mt-4">
-          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+
+        {/* Sidebar Nav Items */}
+        <nav className="flex-1 p-4 flex flex-col gap-1.5 mt-4">
+          <div className="px-4 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             Main Menu
           </div>
-          <Link href={user.role === 'ADMIN' ? '/admin' : user.role === 'MANAGER' ? '/manager' : '/employee'} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 hover:text-white transition-all font-medium group">
-            <LayoutDashboard className="w-5 h-5 text-slate-400 group-hover:text-indigo-400" />
+          
+          {/* Dashboard Link */}
+          <Link 
+            href={user.role === 'ADMIN' ? '/admin' : user.role === 'MANAGER' ? '/manager' : '/employee'} 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              transition: 'all 0.2s ease',
+              textDecoration: 'none',
+              backgroundColor: isDashboardActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+              color: isDashboardActive ? '#6366f1' : '#64748b'
+            }}
+            className="sidebar-nav-link"
+          >
+            <LayoutDashboard className="w-4 h-4" />
             Dashboard
           </Link>
 
+          {/* Goals List Link */}
           {user.role === 'EMPLOYEE' && (
-            <Link href="/employee/goals" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 hover:text-white transition-all font-medium group">
-              <Target className="w-5 h-5 text-slate-400 group-hover:text-indigo-400" />
+            <Link 
+              href="/employee/goals" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                transition: 'all 0.2s ease',
+                textDecoration: 'none',
+                backgroundColor: isGoalsActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                color: isGoalsActive ? '#6366f1' : '#64748b'
+              }}
+              className="sidebar-nav-link"
+            >
+              <Target className="w-4 h-4" />
               Goals List
             </Link>
           )}
 
+          {/* Admin routes */}
           {user.role === 'ADMIN' && (
             <>
-              <Link href="/admin/analytics" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 hover:text-white transition-all font-medium group">
-                <Activity className="w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+              <Link 
+                href="/admin/analytics" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease',
+                  textDecoration: 'none',
+                  backgroundColor: isAnalyticsActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                  color: isAnalyticsActive ? '#6366f1' : '#64748b'
+                }}
+                className="sidebar-nav-link"
+              >
+                <Activity className="w-4 h-4" />
                 Analytics
               </Link>
-              <Link href="/admin/escalations" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 hover:text-white transition-all font-medium group">
-                <AlertTriangle className="w-5 h-5 text-slate-400 group-hover:text-rose-400 transition-colors" />
+              <Link 
+                href="/admin/escalations" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease',
+                  textDecoration: 'none',
+                  backgroundColor: isEscalationsActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                  color: isEscalationsActive ? '#6366f1' : '#64748b'
+                }}
+                className="sidebar-nav-link"
+              >
+                <AlertTriangle className="w-4 h-4" />
                 Escalations
               </Link>
             </>
           )}
         </nav>
-        <div className="p-6 border-t border-[#1e293b] bg-slate-900/50">
+
+        {/* User profile section at the bottom */}
+        <div 
+          className="p-6" 
+          style={{ 
+            borderTop: '1px solid #f1f5f9',
+            backgroundColor: '#ffffff'
+          }}
+        >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold">{user.name.charAt(0)}</span>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-md shrink-0">
+              <span className="text-white font-bold text-sm">{user.name.charAt(0)}</span>
             </div>
-            <div>
-              <p className="text-sm font-bold text-white">{user.name}</p>
-              <p className="text-xs text-indigo-300 font-medium">{user.role}</p>
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-slate-800 truncate">{user.name}</p>
+              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{user.role}</p>
             </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center w-full justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-rose-400 border border-rose-400/20 hover:bg-rose-500/10 hover:border-rose-400/50 rounded-lg transition-all"
+            className="flex items-center w-full justify-center gap-2 px-4 py-2 text-xs font-bold text-rose-500 border border-rose-100 hover:bg-rose-50 rounded-lg transition-all"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             Logout Account
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col max-h-screen overflow-y-auto bg-transparent">
-        <header className="h-16 border-b border-border bg-white flex items-center px-8 justify-between sticky top-0 z-10 shadow-sm">
-          <h1 className="text-xl font-semibold capitalize text-slate-800">{user.role.toLowerCase()} Dashboard</h1>
+      {/* Style overrides for quiet menu items hover states */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .sidebar-nav-link:hover {
+          color: #0f172a !important;
+          background-color: #f8fafc !important;
+        }
+      `}} />
+
+      {/* 
+        Issue 1 — Page background:
+        Replaced the flat wash/transparent main wrapper background with
+        a clean, ultra-premium off-white (#f8fafc).
+      */}
+      <main className="flex-1 flex flex-col max-h-screen overflow-y-auto" style={{ backgroundColor: '#f8fafc' }}>
+        {/* 
+          Issue 5 — Top navbar:
+          White background (#ffffff), border bottom (1px solid #e2e8f0),
+          consistent padding, and bell color configurations.
+        */}
+        <header 
+          className="h-16 flex items-center px-8 justify-between sticky top-0 z-10 shrink-0"
+          style={{ 
+            backgroundColor: '#ffffff',
+            borderBottom: '1px solid #e2e8f0'
+          }}
+        >
+          <h1 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+            {user.role.toLowerCase()} Dashboard
+          </h1>
           <div className="flex items-center gap-6">
-            <div className={`badge ${activeCycle === 'NONE' || !activeCycle ? 'bg-slate-100 text-slate-600' : 'badge-blue'}`}>
+            
+            {/* Active Cycle Pill Badge */}
+            <div 
+              style={{ 
+                backgroundColor: '#eef2ff', 
+                color: '#4f46e5', 
+                border: '1px solid #c7d2fe', 
+                borderRadius: '999px', 
+                fontSize: '12px', 
+                fontWeight: 600,
+                padding: '4px 14px'
+              }}
+            >
               Active Cycle: {getCycleLabel(activeCycle)}
             </div>
 
-            {/* Premium Interactive Notification Bell System */}
+            {/* Notification Bell Icon */}
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={handleBellClick}
-                className="relative p-2 rounded-full hover:bg-slate-100 transition-all text-slate-600 focus:outline-none"
+                className="relative p-2 rounded-full transition-all text-[#64748b] hover:text-[#0f172a] hover:bg-slate-50 focus:outline-none"
               >
-                <Bell className="w-6 h-6" />
+                <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 w-5 h-5 rounded-full bg-rose-500 text-white font-bold text-[10px] flex items-center justify-center animate-bounce shadow-md">
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white font-bold text-[9px] flex items-center justify-center shadow-sm">
                     {unreadCount}
                   </span>
                 )}
@@ -198,6 +332,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
+        
+        {/* Main page content wrapper */}
         <div className="p-8">
           {children}
         </div>

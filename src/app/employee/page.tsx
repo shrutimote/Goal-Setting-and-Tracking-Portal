@@ -5,7 +5,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { useState, useEffect } from 'react'
 import { GoalHealthCard } from '@/components/GoalHealthCard'
 import { WhatIfSimulator } from '@/components/WhatIfSimulator'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Target } from 'lucide-react'
 import { formatLocalDate } from '@/lib/date-utils'
 import { getGoalProgress } from '@/lib/notifications'
 
@@ -82,13 +82,26 @@ export default function EmployeeDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">My Dashboard</h2>
-          <p className="text-muted-foreground">Manage your performance objectives and track progress.</p>
+          <p className="text-sm text-slate-400 font-medium mt-1">Manage your performance objectives and track progress.</p>
         </div>
+        
+        {/* Issue 6: + Add New Goal button customized to match login page primary */}
         <button 
-          className={`btn font-bold transition-all shadow-md ${!isCycleActive ? 'bg-slate-200 text-slate-400 cursor-not-allowed border-none shadow-none' : 'btn-primary bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20'}`}
+          className="transition-all"
+          style={{ 
+            backgroundColor: isCycleActive ? '#4f46e5' : '#e2e8f0', 
+            color: isCycleActive ? '#ffffff' : '#94a3b8', 
+            borderRadius: '10px', 
+            fontSize: '13px', 
+            fontWeight: 600, 
+            padding: '10px 18px',
+            border: 'none',
+            cursor: isCycleActive ? 'pointer' : 'not-allowed',
+            boxShadow: isCycleActive ? '0 4px 12px rgba(79, 70, 229, 0.15)' : 'none'
+          }}
           onClick={() => {
             if (isCycleActive) window.location.href = '/employee/new-goal'
           }}
@@ -99,27 +112,87 @@ export default function EmployeeDashboard() {
       </div>
 
       {!isCycleActive ? (
-        <div className="flex flex-col items-center justify-center py-16 card text-center border-dashed bg-slate-50/50">
-          <AlertTriangle className="w-16 h-16 text-slate-400 mb-4 animate-bounce" />
-          <h3 className="text-xl font-bold text-slate-700 mb-1">No Active Performance Cycle</h3>
-          <p className="text-sm text-slate-500 max-w-md leading-relaxed">
+        <div className="flex flex-col items-center justify-center py-16 text-center" style={{ backgroundColor: '#ffffff', border: '1px dashed #cbd5e1', borderRadius: '14px' }}>
+          <AlertTriangle className="w-12 h-12 text-amber-500 mb-4 animate-bounce" />
+          <h3 className="text-lg font-bold text-slate-800 mb-1">No Active Performance Cycle</h3>
+          <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
             There is currently no active performance cycle configured for check-ins or submissions. Contact your manager or HR Administration.
           </p>
         </div>
       ) : (
         <>
+          {/* Issue 3: Stat Cards designed with borders, white background and left colored stripe */}
           <div className="grid grid-cols-3 gap-6 mb-8">
-            <div className="card">
-              <h3 className="text-sm font-medium text-slate-500 mb-2 font-semibold">Total Goals</h3>
-              <p className="text-3xl font-bold text-slate-800">{totalGoals}</p>
+            {/* Total Goals Card */}
+            <div 
+              className="flex flex-col relative overflow-hidden" 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '14px', 
+                padding: '24px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+              }}
+            >
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#6366f1' }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '8px' }}>
+                Total Goals
+              </h3>
+              <p style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                {totalGoals}
+              </p>
             </div>
-            <div className="card">
-              <h3 className="text-sm font-medium text-slate-500 mb-2 font-semibold">Total Weightage</h3>
-              <p className="text-3xl font-bold text-slate-800">{totalWeightage}%</p>
+
+            {/* Total Weightage Card */}
+            <div 
+              className="flex flex-col relative overflow-hidden" 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '14px', 
+                padding: '24px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+              }}
+            >
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#8b5cf6' }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '8px' }}>
+                Total Weightage
+              </h3>
+              <p style={{ fontSize: '28px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                {totalWeightage}%
+              </p>
             </div>
-            <div className="card">
-              <h3 className="text-sm font-medium text-slate-500 mb-2 font-semibold">Status</h3>
-              <p className={`text-3xl font-bold ${pendingCount > 0 ? 'text-amber-500' : 'text-indigo-600'}`}>{statusText}</p>
+
+            {/* Status Card - Issue 4: drafting status rendered as a pill badge */}
+            <div 
+              className="flex flex-col relative overflow-hidden" 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '14px', 
+                padding: '24px', 
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+              }}
+            >
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: '#10b981' }} />
+              <h3 style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8', marginBottom: '12px' }}>
+                Status
+              </h3>
+              <div className="flex items-center">
+                {statusText === 'Drafting open' ? (
+                  <span style={{ backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                    Drafting open
+                  </span>
+                ) : statusText === 'Awaiting approvals' ? (
+                  <span style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fef3c7', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                    Awaiting approvals
+                  </span>
+                ) : (
+                  <span style={{ backgroundColor: '#f5f3ff', color: '#6d28d9', border: '1px solid #ddd6fe', fontSize: '13px', fontWeight: 600, padding: '4px 12px', borderRadius: '999px', display: 'inline-block' }}>
+                    Lock & Active
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -129,14 +202,49 @@ export default function EmployeeDashboard() {
           {isLoading ? (
             <p className="text-slate-500 font-medium">Loading goals...</p>
           ) : enrichedGoals.length === 0 ? (
-            <div className="text-center py-12 card border-dashed">
-              <p className="text-slate-500 font-medium mb-4">You haven't set any goals for this cycle yet.</p>
+            
+            /* Issue 7: Goal Health Tracker empty state card styled with Target icon and outline button */
+            <div 
+              className="text-center py-12 flex flex-col items-center justify-center"
+              style={{ 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '14px', 
+                padding: '40px 24px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.01)' 
+              }}
+            >
+              <Target className="w-8 h-8 text-slate-300 mb-3" />
+              
+              <p style={{ color: '#94a3b8', fontSize: '14px', fontWeight: 500, marginBottom: '16px' }}>
+                You haven't set any goals for this cycle yet.
+              </p>
+              
               <button 
-                className="btn btn-outline border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold" 
+                className="empty-state-btn"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  border: '1.5px solid #e2e8f0', 
+                  borderRadius: '8px', 
+                  color: '#475569', 
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }} 
                 onClick={() => window.location.href = '/employee/new-goal'}
               >
                 Create First Goal
               </button>
+              
+              <style dangerouslySetInnerHTML={{ __html: `
+                .empty-state-btn:hover {
+                  border-color: #94a3b8 !important;
+                  color: #0f172a !important;
+                  background-color: #f8fafc !important;
+                }
+              `}} />
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-6">
