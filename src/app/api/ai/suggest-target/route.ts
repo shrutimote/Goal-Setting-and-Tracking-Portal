@@ -1,33 +1,59 @@
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const data = await request.json()
-  const { thrustArea, title } = data
+  try {
+    const data = await request.json()
+    const { thrustArea, title } = data
 
-  await new Promise((resolve) => setTimeout(resolve, 1000)) // AI delay
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 })
+    }
 
-  let target = '100'
-  let uom = 'NUMERIC'
+    const prompt = `
+      You are an expert enterprise metrics consultant. Suggest a highly realistic, industry-standard Unit of Measure (UoM) and Target for the following corporate objective:
+      
+      Thrust Area: "${thrustArea || ''}"
+      Objective Title: "${title || ''}"
+      
+      Output a valid JSON object matching this schema:
+      {
+        "suggestedTarget": string (a realistic target value, e.g. "98" or "250000" or a date "2026-06-30" or "1"),
+        "suggestedUom": string (MUST be exactly one of: "Numeric", "Percent", "Timeline", "Zero-Based"),
+        "reasoning": string (a short 1-sentence explanation of why this target is standard and how to achieve it)
+      }
+      Return ONLY the raw JSON string. Do not include markdown codeblocks or wrapper objects.
+    `
 
-  const lowerTitle = (title || '').toLowerCase()
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    )
 
-  if (thrustArea === 'Revenue' || lowerTitle.includes('sales')) {
-    target = '250000'
-    uom = 'NUMERIC'
-  } else if (thrustArea === 'Customer Success' || lowerTitle.includes('satisfaction') || lowerTitle.includes('nps')) {
-    target = '95'
-    uom = 'PERCENT'
-  } else if (thrustArea === 'Operational Excellence' || lowerTitle.includes('incident') || lowerTitle.includes('safety')) {
-    target = '0'
-    uom = 'ZERO_BASED'
-  } else if (lowerTitle.includes('launch') || lowerTitle.includes('deliver')) {
-    target = new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0] // 3 months from now
-    uom = 'TIMELINE'
+    if (!response.ok) {
+      const errText = await response.text()
+      return NextResponse.json({ error: `Gemini API returned error: ${errText}` }, { status: response.status })
+    }
+
+    const responseData = await response.json()
+    const responseText = responseData.candidates?.[0]?.content?.parts?.[0]?.text
+
+    if (!responseText) {
+      return NextResponse.json({ error: 'Empty response from Gemini API' }, { status: 500 })
+    }
+
+    const parsedResult = JSON.parse(responseText.trim())
+    return NextResponse.json(parsedResult)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  return NextResponse.json({
-    suggestedTarget: target,
-    suggestedUom: uom,
-    reasoning: `Based on historical data for '${thrustArea}' and your goal title, this is a highly realistic target.`
-  })
 }

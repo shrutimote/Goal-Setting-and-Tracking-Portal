@@ -1,54 +1,60 @@
 import { NextResponse } from 'next/server'
 
-// Mock AI Service with simulated delay and realistic feedback
 export async function POST(request: Request) {
-  const data = await request.json()
-  const { title, description } = data
+  try {
+    const data = await request.json()
+    const { title, description } = data
 
-  // Simulate AI delay
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 })
+    }
 
-  const combinedText = `${title} ${description}`.toLowerCase()
-  
-  // Basic heuristic mock to feel like real AI
-  let score = 50
-  let feedback = []
-  
-  const hasMetric = /\d/.test(combinedText) || combinedText.includes('percent')
-  const hasTimeframe = combinedText.includes('q1') || combinedText.includes('q2') || combinedText.includes('q3') || combinedText.includes('q4') || combinedText.includes('month') || combinedText.includes('year')
+    const prompt = `
+      You are an expert HR Performance Coach. Analyze the following goal and evaluate it based on the SMART framework (Specific, Measurable, Achievable, Relevant, Time-bound).
+      
+      Goal Title: "${title || ''}"
+      Goal Description: "${description || ''}"
+      
+      Analyze the goal and output a valid JSON object matching this schema:
+      {
+        "score": number (between 0 and 100 representing SMART compliance),
+        "feedback": string[] (list of 2-3 short feedback items, e.g. "✓ Measurable metric found." or "⚠ Missing a specific timeframe."),
+        "alignment": string (a short 1-sentence encouraging appraisal),
+        "suggestion": string (a perfect, rewritten SMART version of this goal combining title and description, using placeholder metrics like [Metric] or [X]% if needed)
+      }
+      Return ONLY the raw JSON string. Do not include markdown codeblocks or wrapper objects.
+    `
 
-  if (hasMetric) {
-    score += 25
-    feedback.push('✓ Measurable target detected.')
-  } else {
-    feedback.push('⚠ Missing a measurable metric. How will you track success?')
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    )
+
+    if (!response.ok) {
+      const errText = await response.text()
+      return NextResponse.json({ error: `Gemini API returned error: ${errText}` }, { status: response.status })
+    }
+
+    const responseData = await response.json()
+    const responseText = responseData.candidates?.[0]?.content?.parts?.[0]?.text
+
+    if (!responseText) {
+      return NextResponse.json({ error: 'Empty response from Gemini API' }, { status: 500 })
+    }
+
+    const parsedResult = JSON.parse(responseText.trim())
+    return NextResponse.json(parsedResult)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  if (hasTimeframe) {
-    score += 25
-    feedback.push('✓ Clear timeframe established.')
-  } else {
-    feedback.push('⚠ No timeframe found. When is this due?')
-  }
-
-  // Generate a mock suggestion
-  let suggestion = ''
-  if (!hasMetric && !hasTimeframe) {
-    suggestion = `Increase [Metric] by [X]% by [Quarter] to support [Objective].`
-  } else if (!hasMetric) {
-    suggestion = `${title || 'Improve process'} by achieving a [X]% increase by the deadline.`
-  } else if (!hasTimeframe) {
-    suggestion = `${title || 'Reach target'} before the end of Q3.`
-  }
-
-  const alignmentMessage = score > 75 
-    ? "Great alignment with company objectives!" 
-    : "This goal is a bit vague. Try refining it using the SMART framework."
-
-  return NextResponse.json({
-    score,
-    feedback,
-    alignment: alignmentMessage,
-    suggestion: suggestion || null
-  })
 }
