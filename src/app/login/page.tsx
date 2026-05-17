@@ -41,19 +41,23 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      {/* Custom Premium Styles embedded directly to prevent any Tailwind conflict or outline leaks */}
-      <style>{`
+      {/* 
+        Inject raw CSS using dangerouslySetInnerHTML to guarantee perfect injection
+        across SSR, Turbopack, and HTML parser rendering boundaries.
+      */}
+      <style dangerouslySetInnerHTML={{ __html: `
         .login-card {
           position: relative !important;
           background: #ffffff !important;
           border: 1px solid #e2e8f0 !important;
-          border-radius: 20px !important; /* Increased to 20px */
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 24px 48px rgba(99,102,241,0.06) !important; /* Softer layered shadow */
+          border-radius: 20px !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 24px 48px rgba(99,102,241,0.06) !important;
           padding: 40px 32px !important;
           width: 100% !important;
-          max-width: 400px !important;
-          overflow: hidden !important; /* Keeps top accent bar perfectly flush */
+          max-width: 380px !important; /* Issue 6: Reduced to 380px */
+          overflow: hidden !important; /* Issue 1: Keeps top accent bar perfectly flush */
           transition: all 0.3s ease;
+          box-sizing: border-box !important;
         }
         .login-accent-bar {
           position: absolute !important;
@@ -62,17 +66,40 @@ export default function LoginPage() {
           right: 0 !important;
           height: 3px !important;
           background: linear-gradient(90deg, #6366f1, #818cf8) !important;
+          z-index: 10 !important;
+        }
+        .login-heading {
+          font-size: 22px !important; /* Issue 3: Welcome back 22px */
+          font-weight: 700 !important;
+          color: #0f172a !important;
+          margin-top: 8px !important;
+          margin-bottom: 4px !important;
+        }
+        .login-tagline {
+          font-size: 12px !important; /* Issue 3: Tagline 12px */
+          font-weight: 600 !important;
+          color: #6366f1 !important; /* Indigo brand line */
+          margin-bottom: 4px !important;
+        }
+        .login-subtext {
+          font-size: 11px !important; /* Issue 3: Subtext 11px */
+          color: #94a3b8 !important;
+          font-weight: 400 !important;
+          white-space: nowrap !important; /* Keep on a single line */
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
         }
         .login-input {
           width: 100% !important;
           padding: 12px 16px !important;
           font-size: 14px !important;
-          border: 1.5px solid #e2e8f0 !important; /* 1.5px solid #e2e8f0 */
-          border-radius: 10px !important; /* 10px */
-          background-color: #fafbfc !important; /* Soft inset feel */
+          border: 1.5px solid #e2e8f0 !important;
+          border-radius: 10px !important;
+          background-color: #fafbfc !important;
           color: #0f172a !important;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
           outline: none !important;
+          box-sizing: border-box !important;
         }
         .login-input:focus {
           border-color: #6366f1 !important;
@@ -84,12 +111,47 @@ export default function LoginPage() {
         }
         .field-label {
           display: block !important;
-          font-size: 10px !important; /* 10px */
-          font-weight: 600 !important; /* 600 weight */
-          text-transform: uppercase !important; /* Small caps */
-          letter-spacing: 0.06em !important; /* 0.06em tracking */
-          color: #475569 !important; /* Color: #475569 */
+          font-size: 10px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.06em !important;
+          color: #475569 !important;
           margin-bottom: 6px !important;
+        }
+        .forgot-password-link {
+          font-size: 11px !important; /* Issue 4: Link size 11px */
+          font-weight: 500 !important;
+          color: #94a3b8 !important; /* Soft subtle gray */
+          text-transform: none !important; /* No uppercase */
+          letter-spacing: normal !important; /* No letter spacing */
+          text-decoration: none !important;
+          transition: color 0.2s ease !important;
+        }
+        .forgot-password-link:hover {
+          color: #6366f1 !important;
+        }
+        .password-input-wrapper {
+          position: relative !important; /* Issue 5: Clean absolute relative boundaries */
+          width: 100% !important;
+        }
+        .password-toggle-btn {
+          position: absolute !important;
+          right: 12px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important; /* Perfectly centered inside field */
+          background: none !important;
+          border: none !important;
+          color: #94a3b8 !important;
+          cursor: pointer !important;
+          padding: 0 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          outline: none !important;
+          z-index: 10 !important;
+        }
+        .password-toggle-btn:hover {
+          color: #6366f1 !important;
         }
         .login-btn-dark {
           width: 100% !important;
@@ -98,11 +160,12 @@ export default function LoginPage() {
           font-weight: 700 !important;
           background-color: #0f172a !important;
           color: #ffffff !important;
-          border-radius: 10px !important; /* Increased to 10px */
+          border-radius: 10px !important;
           border: none !important;
           cursor: pointer !important;
           transition: background-color 0.2s ease, transform 0.1s ease !important;
           outline: none !important;
+          box-sizing: border-box !important;
         }
         .login-btn-dark:hover {
           background-color: #1e293b !important;
@@ -115,10 +178,10 @@ export default function LoginPage() {
           padding: 10px 16px !important;
           font-size: 13px !important;
           font-weight: 600 !important;
-          background-color: #fafbfc !important; /* Soft bg to match inputs */
+          background-color: #fafbfc !important;
           color: #334155 !important;
-          border: 1.5px solid #e2e8f0 !important; /* 1.5px solid */
-          border-radius: 10px !important; /* 10px */
+          border: 1.5px solid #e2e8f0 !important;
+          border-radius: 10px !important;
           cursor: pointer !important;
           display: flex !important;
           align-items: center !important;
@@ -126,28 +189,11 @@ export default function LoginPage() {
           gap: 8px !important;
           transition: background-color 0.2s ease, border-color 0.2s ease !important;
           outline: none !important;
+          box-sizing: border-box !important;
         }
         .login-btn-sso:hover {
           background-color: #f8fafc !important;
           border-color: #cbd5e1 !important;
-        }
-        .password-toggle-btn {
-          position: absolute !important;
-          right: 12px !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          background: none !important;
-          border: none !important;
-          color: #94a3b8 !important;
-          cursor: pointer !important;
-          padding: 0 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          outline: none !important;
-        }
-        .password-toggle-btn:hover {
-          color: #6366f1 !important;
         }
         .divider-container {
           position: relative !important;
@@ -169,16 +215,16 @@ export default function LoginPage() {
           font-weight: 700 !important;
           letter-spacing: 0.05em !important;
         }
-      `}</style>
+      `}} />
 
       {/* Main Login Card Wrapper */}
       <div className="login-card">
-        {/* Thin Branded Accent Bar at the absolute top flush edge */}
+        {/* Issue 2: Top Accent Bar positioned absolutely inside card */}
         <div className="login-accent-bar" />
 
-        {/* Centered Header block - Redesigned Hierarchy */}
+        {/* Centered Header block */}
         <div className="flex flex-col items-center justify-center mb-5 text-center">
-          {/* logo & brand name */}
+          {/* Logo Name & Icon */}
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
               <Target className="w-5 h-5 text-white" />
@@ -186,21 +232,13 @@ export default function LoginPage() {
             <span className="text-lg font-bold text-slate-800 tracking-tight">GoalPortal</span>
           </div>
           
-          {/* Welcome back heading */}
-          <h2 className="text-xl font-bold text-slate-900 mb-1">Welcome back</h2>
-
-          {/* tagline */}
-          <p className="text-xs font-semibold text-slate-500 mb-1">
-            Empowering Every Step of Your Journey
-          </p>
-
-          {/* subtext */}
-          <p className="text-[11px] text-slate-400">
-            Sign in to manage your executive dashboard
-          </p>
+          {/* Issue 3: Highly Calibrated Text Sizing & Colors */}
+          <h2 className="login-heading">Welcome back</h2>
+          <p className="login-tagline">Empowering Every Step of Your Journey</p>
+          <p className="login-subtext">Sign in to manage your executive dashboard</p>
         </div>
 
-        {/* Separation Divider Rule */}
+        {/* Separator rule */}
         <hr className="w-full border-t border-slate-100 my-5" style={{ borderTop: '1px solid #f1f5f9' }} />
 
         {error && (
@@ -210,7 +248,7 @@ export default function LoginPage() {
         )}
         
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
-          {/* Email Address form field */}
+          {/* Email Address Form Field */}
           <div>
             <label className="field-label">
               Email Address
@@ -225,21 +263,23 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password form field with Forgot Password on the same line */}
+          {/* Password Form Field */}
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="field-label" style={{ marginBottom: 0 }}>
                 Password
               </label>
+              {/* Issue 4: Quiet Link Aligned on Left/Right */}
               <a 
                 href="#" 
-                className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors uppercase tracking-wider"
+                className="forgot-password-link"
                 onClick={(e) => e.preventDefault()}
               >
                 Forgot Password?
               </a>
             </div>
-            <div className="relative">
+            {/* Issue 5: Position Relative Input Wrapper */}
+            <div className="password-input-wrapper">
               <input 
                 type={showPassword ? "text" : "password"} 
                 className="login-input" 
@@ -258,13 +298,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Log In Button - Solid Dark Button */}
+          {/* Log In Button */}
           <button type="submit" className="login-btn-dark">
             Log In
           </button>
         </form>
 
-        {/* OR Divider Line */}
+        {/* Divider Line */}
         <div className="divider-container">
           <div className="divider-line">
             <div className="w-full border-t border-slate-200"></div>
@@ -274,14 +314,14 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Single Sign-On Outlined Button with Shield Icon */}
+        {/* Single Sign-On SSO Button */}
         <button type="button" className="login-btn-sso">
           <Shield className="w-4 h-4 text-slate-400" />
           Single Sign-On (SSO)
         </button>
       </div>
 
-      {/* Muted Sub-text Below the Card */}
+      {/* Muted Centered Plain Text Below the Card */}
       <p className="text-[11px] text-slate-400 mt-6 text-center font-medium tracking-wide">
         Don't have an account? <span className="text-slate-500 font-semibold">Contact your manager.</span>
       </p>
