@@ -137,7 +137,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col max-h-screen overflow-y-auto bg-slate-50/50">
+      <main className="flex-1 flex flex-col max-h-screen overflow-y-auto bg-transparent">
         <header className="h-16 border-b border-border bg-white flex items-center px-8 justify-between sticky top-0 z-10 shadow-sm">
           <h1 className="text-xl font-semibold capitalize text-slate-800">{user.role.toLowerCase()} Dashboard</h1>
           <div className="flex items-center gap-6">
