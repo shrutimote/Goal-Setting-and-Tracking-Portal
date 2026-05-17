@@ -30,6 +30,7 @@ export function WhatIfSimulator({ goals }: { goals: any[] }) {
   return (
     <div 
       style={{
+        position: 'relative',
         backgroundColor: '#ffffff',
         border: '1px solid #e2e8f0',
         borderRadius: '14px',

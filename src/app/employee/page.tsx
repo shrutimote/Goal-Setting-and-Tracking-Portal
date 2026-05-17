@@ -131,8 +131,9 @@ export default function EmployeeDashboard() {
             
             {/* Total Goals Card */}
             <div 
-              className="flex flex-col relative overflow-hidden" 
               style={{ 
+                position: 'relative',
+                overflow: 'hidden',
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
@@ -152,8 +153,9 @@ export default function EmployeeDashboard() {
 
             {/* Total Weightage Card */}
             <div 
-              className="flex flex-col relative overflow-hidden" 
               style={{ 
+                position: 'relative',
+                overflow: 'hidden',
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
@@ -173,8 +175,9 @@ export default function EmployeeDashboard() {
 
             {/* Status Card */}
             <div 
-              className="flex flex-col relative overflow-hidden" 
               style={{ 
+                position: 'relative',
+                overflow: 'hidden',
                 backgroundColor: '#ffffff', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '14px', 
@@ -258,7 +261,14 @@ export default function EmployeeDashboard() {
               `}} />
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-6">
+            <div 
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '14px',
+                width: '100%'
+              }}
+            >
               {enrichedGoals.map((goal: any) => (
                 <GoalHealthCard key={goal.id} goal={goal} />
               ))}

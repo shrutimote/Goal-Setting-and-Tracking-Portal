@@ -12,6 +12,7 @@ export function GoalHealthCard({ goal }: { goal: any }) {
   return (
     <div 
       style={{ 
+        width: '100%',
         backgroundColor: '#ffffff',
         border: '1px solid #e2e8f0',
         borderRadius: '14px',
@@ -19,7 +20,7 @@ export function GoalHealthCard({ goal }: { goal: any }) {
         boxShadow: '0 1px 3px rgba(0,0,0,0.01)',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'between',
+        justifyContent: 'space-between',
         minHeight: '190px',
         boxSizing: 'border-box'
       }}
@@ -105,8 +106,8 @@ export function GoalHealthCard({ goal }: { goal: any }) {
         </div>
         
         {/* Circular Progress Ring */}
-        <div className="relative w-11 h-11" style={{ flexShrink: 0 }}>
-          <svg viewBox="0 0 36 36" className="w-11 h-11">
+        <div style={{ position: 'relative', width: '44px', height: '44px', flexShrink: 0 }}>
+          <svg viewBox="0 0 36 36" style={{ width: '44px', height: '44px' }}>
             <path
               style={{ color: '#e2e8f0' }}
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
